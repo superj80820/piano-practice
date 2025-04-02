@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import * as Tone from 'tone';
-import { Factory, Voice, Tuplet, Flow } from 'vexflow';
+import { Factory } from 'vexflow';
 
 interface PianoKey {
   note: string;
