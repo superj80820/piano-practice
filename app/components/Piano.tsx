@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import * as Tone from 'tone';
-import { Factory } from 'vexflow';
+import { Factory, Voice, Tuplet, Flow } from 'vexflow';
 
 interface PianoKey {
   note: string;
@@ -61,6 +61,7 @@ export default function Piano() {
   const [currentKey] = useState<string>('C');
   const [canReplay, setCanReplay] = useState(false);
   const [showScore, setShowScore] = useState(false);
+  const [showSolfege, setShowSolfege] = useState(false);
   const scoreRef = useRef<HTMLDivElement>(null);
 
   // 修改：定義每個調性的升降記號
@@ -194,24 +195,28 @@ export default function Piano() {
         .map(({ note, duration }) => {
           const vfNote = note.toLowerCase();
           let vfDuration;
+          // 簡化時值處理
           switch (duration) {
             case '2n':
-              vfDuration = 'h';
+              vfDuration = 'h';  // 二分音符
               break;
             case '4n':
-              vfDuration = 'q';
+              vfDuration = 'q';  // 四分音符
               break;
             case '8n':
-              vfDuration = '8';
+              vfDuration = '8';  // 八分音符
+              break;
+            case '16n':
+              vfDuration = '16'; // 十六分音符
               break;
             default:
-              vfDuration = 'q';
+              vfDuration = 'q';  // 預設為四分音符
           }
           return `${vfNote}/${vfDuration}`;
         })
         .join(', ');
 
-      // 創建基本的五線譜
+      // 創建基本的五線譜，使用更簡單的方式
       const stave = system
         .addStave({
           voices: [
@@ -232,16 +237,19 @@ export default function Piano() {
       const startX = staveInfo.x;
       const y = staveInfo.y + staveInfo.h + 30;  // 在五線譜下方 30px
 
-      notes.forEach((note, index) => {
-        const noteName = note.slice(0, -1);  // 移除八度數字
-        const solfege = NOTE_TO_SOLFEGE[noteName.replace(/[#b]/, '')];  // 處理升降記號
-        const x = startX + (noteWidth * (index + 0.5));  // 置中對齊每個音符
+      // 只在 showSolfege 為 true 時繪製唱名
+      if (showSolfege) {
+        notes.forEach((note, index) => {
+          const noteName = note.slice(0, -1);  // 移除八度數字
+          const solfege = NOTE_TO_SOLFEGE[noteName.replace(/[#b]/, '')];  // 處理升降記號
+          const x = startX + (noteWidth * (index + 0.5));  // 置中對齊每個音符
 
-        context.save();
-        context.setFont('Arial', 16);
-        context.fillText(solfege, x - 15, y);
-        context.restore();
-      });
+          context.save();
+          context.setFont('Arial', 16);
+          context.fillText(solfege, x - 15, y);
+          context.restore();
+        });
+      }
 
     } catch (error) {
       console.error('Error drawing score:', error);
@@ -361,14 +369,44 @@ export default function Piano() {
 
     // 定義節奏型態（總和必須為4拍）
     const rhythmPatterns = [
-      // 基本節奏
-      ['4n', '4n', '4n', '4n'],  // 四個四分音符
-      ['2n', '4n', '4n'],        // 一個二分音符加兩個四分音符
-      ['4n', '2n', '4n'],        // 四分音符、二分音符、四分音符
-      // 包含八分音符的節奏
-      ['4n', '8n', '8n', '4n', '4n'],  // 四分音符、兩個八分音符、兩個四分音符
-      ['8n', '8n', '4n', '4n', '4n'],  // 兩個八分音符、三個四分音符
-      ['4n', '4n', '8n', '8n', '4n'],  // 兩個四分音符、兩個八分音符、一個四分音符
+      // 基本節奏（4拍）
+      ['4n', '4n', '4n', '4n'],           // ♩ ♩ ♩ ♩
+      ['2n', '2n'],                       // ♩♩ ♩♩
+      ['2n', '4n', '4n'],                 // ♩♩ ♩ ♩
+      ['4n', '2n', '4n'],                 // ♩ ♩♩ ♩
+      ['4n', '4n', '2n'],                 // ♩ ♩ ♩♩
+
+      // 八分音符組合（4拍）
+      ['8n', '8n', '4n', '4n', '4n'],     // ♪♪ ♩ ♩ ♩
+      ['4n', '8n', '8n', '4n', '4n'],     // ♩ ♪♪ ♩ ♩
+      ['4n', '4n', '8n', '8n', '4n'],     // ♩ ♩ ♪♪ ♩
+      ['4n', '4n', '4n', '8n', '8n'],     // ♩ ♩ ♩ ♪♪
+      ['8n', '8n', '8n', '8n', '2n'],     // ♪♪ ♪♪ ♩♩
+
+      // 十六分音符組合（4拍）
+      ['4n', '4n', '16n', '16n', '16n', '16n', '4n'],  // ♩ ♩ ♬♬ ♩
+      ['16n', '16n', '16n', '16n', '4n', '4n', '4n'],  // ♬♬ ♩ ♩ ♩
+      ['4n', '16n', '16n', '16n', '16n', '4n', '4n'],  // ♩ ♬♬ ♩ ♩
+      ['4n', '4n', '4n', '16n', '16n', '16n', '16n'],  // ♩ ♩ ♩ ♬♬
+
+      // 混合節奏 - 八分音符和四分音符（4拍）
+      ['8n', '8n', '4n', '8n', '8n', '4n'],  // ♪♪ ♩ ♪♪ ♩
+      ['4n', '8n', '8n', '8n', '8n', '4n'],  // ♩ ♪♪ ♪♪ ♩
+      ['8n', '8n', '8n', '8n', '4n', '4n'],  // ♪♪ ♪♪ ♩ ♩
+
+      // 混合節奏 - 二分音符和八分音符（4拍）
+      ['2n', '8n', '8n', '4n'],              // ♩♩ ♪♪ ♩
+      ['8n', '8n', '2n', '4n'],              // ♪♪ ♩♩ ♩
+      ['4n', '8n', '8n', '2n'],              // ♩ ♪♪ ♩♩
+
+      // 混合節奏 - 十六分音符和八分音符（4拍）
+      ['16n', '16n', '16n', '16n', '8n', '8n', '4n', '4n'],  // ♬♬ ♪♪ ♩ ♩
+      ['8n', '8n', '16n', '16n', '16n', '16n', '4n'],        // ♪♪ ♬♬ ♩
+      ['4n', '16n', '16n', '8n', '8n', '4n'],                // ♩ ♬ ♪♪ ♩
+
+      // 特殊組合（4拍）
+      ['8n', '8n', '4n', '4n', '8n', '8n'],  // ♪♪ ♩ ♩ ♪♪
+      ['4n', '8n', '4n', '8n', '4n'],        // ♩ ♪ ♩ ♪ ♩
     ];
 
     // 隨機選擇節奏型態
@@ -412,28 +450,32 @@ export default function Piano() {
     setCanReplay(true);  // 新增：啟用重播按鈕
     drawScore(melody);
 
-    // 設置播放序列
+    // 修改 generateCMajorMelody 函數中的時間計算
     let time = 0;
     const now = Tone.now();
 
     melody.forEach(({ note, duration }) => {
-      // 根據音符時值設置持續時間
+      // 根據音符時值設置持續時間（以秒為單位）
       let durationInSeconds;
       switch (duration) {
         case '2n':
-          durationInSeconds = 1.0;  // 二分音符
+          durationInSeconds = 1.0;  // 二分音符 = 1秒
           break;
         case '4n':
-          durationInSeconds = 0.5;  // 四分音符
+          durationInSeconds = 0.5;  // 四分音符 = 0.5秒
           break;
         case '8n':
-          durationInSeconds = 0.25; // 八分音符
+          durationInSeconds = 0.25; // 八分音符 = 0.25秒
+          break;
+        case '16n':
+          durationInSeconds = 0.125; // 十六分音符 = 0.125秒
           break;
         default:
           durationInSeconds = 0.5;  // 預設為四分音符
       }
 
-      synth.triggerAttackRelease(note, duration, now + time);
+      // 使用更精確的時間控制
+      synth.triggerAttackRelease(note, durationInSeconds, now + time);
 
       setTimeout(() => {
         setActiveKeys(new Set([note]));
@@ -497,6 +539,17 @@ export default function Piano() {
         </button>
 
         <button
+          onClick={() => setShowSolfege(!showSolfege)}
+          className={`
+            px-6 py-3 rounded-full text-white font-semibold
+            ${showSolfege ? 'bg-orange-600' : 'bg-orange-500 hover:bg-orange-600'} 
+            transition-colors shadow-lg
+          `}
+        >
+          {showSolfege ? '不產生唱名' : '產生唱名'}
+        </button>
+
+        <button
           onClick={replayMelody}
           disabled={isPlaying || !canReplay}
           className={`
@@ -520,6 +573,8 @@ export default function Piano() {
         >
           {showScore ? '隱藏五線譜' : '顯示五線譜'}
         </button>
+
+
       </div>
 
       <div
