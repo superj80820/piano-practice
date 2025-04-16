@@ -114,7 +114,6 @@ export default function Piano() {
   const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set());
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentMelody, setCurrentMelody] = useState<{ note: string; duration: string }[]>([]);
-  const [currentKey] = useState<string>('C');
   const [canReplay, setCanReplay] = useState(false);
   const [showScore, setShowScore] = useState(false);
   const [showSolfege, setShowSolfege] = useState(false);
@@ -276,9 +275,6 @@ export default function Piano() {
 
         return notes.join(', ');
       });
-
-      // 創建五線譜系統
-      const staveWidth = (measureCount === 2 ? 700 : 1100) / measureCount;
 
       // 創建第一個小節
       system
