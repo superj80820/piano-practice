@@ -53,6 +53,62 @@ const NOTE_TO_SOLFEGE: { [key: string]: string } = {
   'B': 'Si'
 };
 
+// 新增：所有調性的音階定義
+const SCALES = {
+  major: [
+    // C大調 (C Major)
+    ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'],
+    // G大調 (G Major)
+    ['G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F#5', 'G5'],
+    // D大調 (D Major)
+    ['D4', 'E4', 'F#4', 'G4', 'A4', 'B4', 'C#5', 'D5'],
+    // A大調 (A Major)
+    ['A4', 'B4', 'C#5', 'D5', 'E5', 'F#5', 'G#5', 'A5'],
+    // E大調 (E Major)
+    ['E4', 'F#4', 'G#4', 'A4', 'B4', 'C#5', 'D#5', 'E5'],
+    // B大調 (B Major)
+    ['B4', 'C#5', 'D#5', 'E5', 'F#5', 'G#5', 'A#5', 'B5'],
+    // F大調 (F Major)
+    ['F4', 'G4', 'A4', 'Bb4', 'C5', 'D5', 'E5', 'F5'],
+    // Bb大調 (Bb Major)
+    ['Bb4', 'C5', 'D5', 'Eb5', 'F5', 'G5', 'A5', 'Bb5'],
+    // Eb大調 (Eb Major)
+    ['Eb4', 'F4', 'G4', 'Ab4', 'Bb4', 'C5', 'D5', 'Eb5'],
+    // Ab大調 (Ab Major)
+    ['Ab4', 'Bb4', 'C5', 'Db5', 'Eb5', 'F5', 'G5', 'Ab5'],
+    // Db大調 (Db Major)
+    ['Db4', 'Eb4', 'F4', 'Gb4', 'Ab4', 'Bb4', 'C5', 'Db5'],
+    // Gb大調 (Gb Major)
+    ['Gb4', 'Ab4', 'Bb4', 'Cb5', 'Db5', 'Eb5', 'F5', 'Gb5']
+  ],
+  minor: [
+    // A小調 (A Minor)
+    ['A4', 'B4', 'C5', 'D5', 'E5', 'F5', 'G5', 'A5'],
+    // E小調 (E Minor)
+    ['E4', 'F#4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5'],
+    // B小調 (B Minor)
+    ['B4', 'C#5', 'D5', 'E5', 'F#5', 'G5', 'A5', 'B5'],
+    // F#小調 (F# Minor)
+    ['F#4', 'G#4', 'A4', 'B4', 'C#5', 'D5', 'E5', 'F#5'],
+    // C#小調 (C# Minor)
+    ['C#4', 'D#4', 'E4', 'F#4', 'G#4', 'A4', 'B4', 'C#5'],
+    // G#小調 (G# Minor)
+    ['G#4', 'A#4', 'B4', 'C#5', 'D#5', 'E5', 'F#5', 'G#5'],
+    // D小調 (D Minor)
+    ['D4', 'E4', 'F4', 'G4', 'A4', 'Bb4', 'C5', 'D5'],
+    // G小調 (G Minor)
+    ['G4', 'A4', 'Bb4', 'C5', 'D5', 'Eb5', 'F5', 'G5'],
+    // C小調 (C Minor)
+    ['C4', 'D4', 'Eb4', 'F4', 'G4', 'Ab4', 'Bb4', 'C5'],
+    // F小調 (F Minor)
+    ['F4', 'G4', 'Ab4', 'Bb4', 'C5', 'Db5', 'Eb5', 'F5'],
+    // Bb小調 (Bb Minor)
+    ['Bb4', 'C5', 'Db5', 'Eb5', 'F5', 'Gb5', 'Ab5', 'Bb5'],
+    // Eb小調 (Eb Minor)
+    ['Eb4', 'F4', 'Gb4', 'Ab4', 'Bb4', 'Cb5', 'Db5', 'Eb5']
+  ]
+};
+
 export default function Piano() {
   const [synth, setSynth] = useState<Tone.Sampler | null>(null);
   const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set());
@@ -62,62 +118,9 @@ export default function Piano() {
   const [canReplay, setCanReplay] = useState(false);
   const [showScore, setShowScore] = useState(false);
   const [showSolfege, setShowSolfege] = useState(false);
+  const [measureCount, setMeasureCount] = useState<2 | 4>(4);
+  const [currentScale, setCurrentScale] = useState<string>('');
   const scoreRef = useRef<HTMLDivElement>(null);
-
-  // 修改：定義每個調性的升降記號
-  const keySignatures: { [key: string]: { type: 'sharp' | 'flat', count: number } } = {
-    'C': { type: 'sharp', count: 0 },
-    'G': { type: 'sharp', count: 1 },  // F#
-    'D': { type: 'sharp', count: 2 },  // F#, C#
-    'A': { type: 'sharp', count: 3 },  // F#, C#, G#
-    'E': { type: 'sharp', count: 4 },  // F#, C#, G#, D#
-    'B': { type: 'sharp', count: 5 },  // F#, C#, G#, D#, A#
-    'F': { type: 'flat', count: 1 },  // Bb
-    'Bb': { type: 'flat', count: 2 },  // Bb, Eb
-    'Eb': { type: 'flat', count: 3 },  // Bb, Eb, Ab
-    'Ab': { type: 'flat', count: 4 },  // Bb, Eb, Ab, Db
-    'Db': { type: 'flat', count: 5 },  // Bb, Eb, Ab, Db, Gb
-  };
-
-  // 修改：轉調函數，根據五度圈處理升降記號
-  const transposeNote = (note: string, fromKey: string, toKey: string): string => {
-    const noteMap = {
-      'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3,
-      'E': 4, 'F': 5, 'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8,
-      'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11
-    };
-
-    // 解析音符和八度
-    const noteName = note.slice(0, -1);
-    const octave = parseInt(note.slice(-1));
-
-    // 計算半音差
-    const fromSemitones = noteMap[fromKey as keyof typeof noteMap];
-    const toSemitones = noteMap[toKey as keyof typeof noteMap];
-    const semitoneShift = (toSemitones - fromSemitones + 12) % 12;
-
-    // 根據目標調性的升降記號決定使用升號還是降號
-    const useSharp = keySignatures[toKey].type === 'sharp';
-
-    // 計算新音符
-    const chromaticScale = useSharp
-      ? ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-      : ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
-
-    const currentSemitone = noteMap[noteName as keyof typeof noteMap];
-    const newSemitone = (currentSemitone + semitoneShift) % 12;
-    const newNote = chromaticScale[newSemitone];
-
-    // 處理八度變化
-    let newOctave = octave;
-    if (currentSemitone + semitoneShift >= 12) {
-      newOctave++;
-    } else if (currentSemitone + semitoneShift < 0) {
-      newOctave--;
-    }
-
-    return `${newNote}${newOctave}`;
-  };
 
   useEffect(() => {
     const newSynth = new Tone.Sampler({
@@ -175,81 +178,128 @@ export default function Piano() {
       // 清除現有的五線譜
       scoreRef.current.innerHTML = '';
 
-      // 初始化 VexFlow
+      // 初始化 VexFlow，根據小節數調整寬度
       const vf = new Factory({
         renderer: {
           elementId: 'score',
-          width: 1000,
-          height: 200,  // 增加高度以容納唱名
+          width: measureCount === 2 ? 800 : 1200,
+          height: measureCount === 2 ? 250 : 500,
         },
       });
 
       const score = vf.EasyScore();
-      const system = vf.System({
-        width: 900,
-        spaceBetweenStaves: 10
+      const system = vf.System();
+
+      // 將音符分組為每小節
+      const measuresNotes: { note: string; duration: string }[][] = [];
+      let currentMeasure: { note: string; duration: string }[] = [];
+      let currentBeats = 0;
+
+      melody.forEach((noteInfo) => {
+        let beatValue: number;
+        switch (noteInfo.duration) {
+          case '2n':
+            beatValue = 2;
+            break;
+          case '4n':
+            beatValue = 1;
+            break;
+          case '8n':
+            beatValue = 0.5;
+            break;
+          case '16n':
+            beatValue = 0.25;
+            break;
+          default:
+            beatValue = 1;
+        }
+
+        if (currentBeats + beatValue > 4) {
+          measuresNotes.push([...currentMeasure]);
+          currentMeasure = [noteInfo];
+          currentBeats = beatValue;
+        } else {
+          currentMeasure.push(noteInfo);
+          currentBeats += beatValue;
+        }
       });
 
-      // 將 melody 轉換為 VexFlow 格式
-      const notesString = melody
-        .map(({ note, duration }) => {
+      if (currentMeasure.length > 0) {
+        measuresNotes.push(currentMeasure);
+      }
+
+      // 為每個小節創建音符字符串
+      const measureStrings = measuresNotes.map(measure => {
+        if (measure.length === 0) {
+          return 'B4/w';  // 如果小節為空，使用全音符休止符
+        }
+
+        let totalBeats = 0;
+        const notes = measure.map(({ note, duration }) => {
           const vfNote = note.toLowerCase();
           let vfDuration;
-          // 簡化時值處理
           switch (duration) {
             case '2n':
-              vfDuration = 'h';  // 二分音符
+              vfDuration = 'h';
+              totalBeats += 2;
               break;
             case '4n':
-              vfDuration = 'q';  // 四分音符
+              vfDuration = 'q';
+              totalBeats += 1;
               break;
             case '8n':
-              vfDuration = '8';  // 八分音符
+              vfDuration = '8';
+              totalBeats += 0.5;
               break;
             case '16n':
-              vfDuration = '16'; // 十六分音符
+              vfDuration = '16';
+              totalBeats += 0.25;
               break;
             default:
-              vfDuration = 'q';  // 預設為四分音符
+              vfDuration = 'q';
+              totalBeats += 1;
           }
           return `${vfNote}/${vfDuration}`;
-        })
-        .join(', ');
+        });
 
-      // 創建基本的五線譜，使用更簡單的方式
-      const stave = system
+        // 如果小節不足4拍，添加休止符
+        if (totalBeats < 4) {
+          const remainingBeats = 4 - totalBeats;
+          if (remainingBeats >= 2) {
+            notes.push('B4/h');  // 添加二分休止符
+          } else if (remainingBeats >= 1) {
+            notes.push('B4/q');  // 添加四分休止符
+          } else if (remainingBeats >= 0.5) {
+            notes.push('B4/8');  // 添加八分休止符
+          }
+        }
+
+        return notes.join(', ');
+      });
+
+      // 創建五線譜系統
+      const staveWidth = (measureCount === 2 ? 700 : 1100) / measureCount;
+
+      // 創建第一個小節
+      system
         .addStave({
           voices: [
-            score.voice(score.notes(notesString))
+            score.voice(score.notes(measureStrings[0]))
           ]
         })
         .addClef('treble')
         .addTimeSignature('4/4');
 
-      // 繪製五線譜
-      vf.draw();
-
-      // 添加唱名
-      const context = vf.getContext();
-      const notes = melody.map(m => m.note);
-      const staveInfo = stave.getBoundingBox();
-      const noteWidth = staveInfo.w / notes.length;
-      const startX = staveInfo.x;
-      const y = staveInfo.y + staveInfo.h + 30;  // 在五線譜下方 30px
-
-      // 只在 showSolfege 為 true 時繪製唱名
-      if (showSolfege) {
-        notes.forEach((note, index) => {
-          const noteName = note.slice(0, -1);  // 移除八度數字
-          const solfege = NOTE_TO_SOLFEGE[noteName.replace(/[#b]/, '')];  // 處理升降記號
-          const x = startX + (noteWidth * (index + 0.5));  // 置中對齊每個音符
-
-          context.save();
-          context.setFont('Arial', 16);
-          context.fillText(solfege, x - 15, y);
-          context.restore();
+      // 創建剩餘的小節
+      for (let i = 1; i < measureCount; i++) {
+        system.addStave({
+          voices: [
+            score.voice(score.notes(measureStrings[i] || 'B4/w'))  // 如果沒有音符，使用全音符休止符
+          ]
         });
       }
+
+      vf.draw();
 
     } catch (error) {
       console.error('Error drawing score:', error);
@@ -303,40 +353,7 @@ export default function Piano() {
     }, time * 1000);
   };
 
-  // 新增：定義每個調性的音階
-  const scaleNotes: { [key: string]: string[] } = {
-    'C': ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
-    'G': ['G', 'A', 'B', 'C', 'D', 'E', 'F#'],
-    'D': ['D', 'E', 'F#', 'G', 'A', 'B', 'C#'],
-    'A': ['A', 'B', 'C#', 'D', 'E', 'F#', 'G#'],
-    'E': ['E', 'F#', 'G#', 'A', 'B', 'C#', 'D#'],
-    'B': ['B', 'C#', 'D#', 'E', 'F#', 'G#', 'A#'],
-    'F': ['F', 'G', 'A', 'Bb', 'C', 'D', 'E'],
-    'Bb': ['Bb', 'C', 'D', 'Eb', 'F', 'G', 'A'],
-    'Eb': ['Eb', 'F', 'G', 'Ab', 'Bb', 'C', 'D'],
-    'Ab': ['Ab', 'Bb', 'C', 'Db', 'Eb', 'F', 'G'],
-    'Db': ['Db', 'Eb', 'F', 'Gb', 'Ab', 'Bb', 'C']
-  };
-
-  // 修改：根據調性獲取和弦音符的輔助函數
-  const getChordNotes = (root: string, octave: string): string[] => {
-    const scale = scaleNotes[currentKey];
-    if (!scale) return [];
-
-    // 在當前調性的音階中找到根音的位置
-    const rootIndex = scale.findIndex(note => note === root);
-    if (rootIndex === -1) return [];
-
-    // 計算三和弦的音符（根音、三度、五度）
-    const octaveNum = parseInt(octave);
-    const rootNote = `${scale[rootIndex]}${octave}`;
-    const thirdNote = `${scale[(rootIndex + 2) % 7]}${(rootIndex + 2) >= 7 ? octaveNum + 1 : octaveNum}`;
-    const fifthNote = `${scale[(rootIndex + 4) % 7]}${(rootIndex + 4) >= 7 ? octaveNum + 1 : octaveNum}`;
-
-    return [rootNote, thirdNote, fifthNote];
-  };
-
-  // 修改：generateCMajorMelody 函數中的和弦進行
+  // 修改：generateCMajorMelody 函数，添加調性顯示
   const generateCMajorMelody = () => {
     if (!synth || isPlaying) return;
     setIsPlaying(true);
@@ -344,137 +361,84 @@ export default function Piano() {
     // 確保 Tone.js 已經準備好
     Tone.start();
 
-    // 根據當前調性定義和弦進行
-    const chordProgressions: { [key: string]: string[][] } = {
-      'C': [
-        // I - IV - V - I
-        ['C4', 'F4', 'G4', 'C4'],
-        // I - vi - IV - V
-        ['C4', 'A4', 'F4', 'G4'],
-        // I - V - vi - IV
-        ['C4', 'G4', 'A4', 'F4'],
-        // vi - IV - I - V
-        ['A4', 'F4', 'C4', 'G4']
+    // 隨機選擇調性類型（大調或小調）
+    const scaleTypes = ['major', 'minor'] as const;
+    const selectedType = scaleTypes[Math.floor(Math.random() * scaleTypes.length)];
+
+    // 在選定的調性類型中隨機選擇一個音階
+    const scales = SCALES[selectedType];
+    const scaleIndex = Math.floor(Math.random() * scales.length);
+    const selectedScale = scales[scaleIndex];
+
+    // 設置當前調性名稱
+    const scaleNames = {
+      major: [
+        'C 大調', 'G 大調', 'D 大調', 'A 大調', 'E 大調', 'B 大調',
+        'F 大調', 'Bb 大調', 'Eb 大調', 'Ab 大調', 'Db 大調', 'Gb 大調'
+      ],
+      minor: [
+        'A 小調', 'E 小調', 'B 小調', 'F# 小調', 'C# 小調', 'G# 小調',
+        'D 小調', 'G 小調', 'C 小調', 'F 小調', 'Bb 小調', 'Eb 小調'
       ]
     };
+    setCurrentScale(scaleNames[selectedType][scaleIndex]);
 
-    // 獲取或生成當前調性的和弦進行
-    const progressions = currentKey === 'C' ? chordProgressions['C'] :
-      chordProgressions['C'].map(progression =>
-        progression.map(note => transposeNote(note, 'C', currentKey))
-      );
+    // 使用選定的音階
+    const availableNotes = selectedScale;
 
-    // 隨機選擇和弦進行
-    const selectedProgression = progressions[Math.floor(Math.random() * progressions.length)];
-
-    // 定義節奏型態（總和必須為4拍）
-    const rhythmPatterns = [
-      // 基本節奏（4拍）
-      ['4n', '4n', '4n', '4n'],           // ♩ ♩ ♩ ♩
-      ['2n', '2n'],                       // ♩♩ ♩♩
-      ['2n', '4n', '4n'],                 // ♩♩ ♩ ♩
-      ['4n', '2n', '4n'],                 // ♩ ♩♩ ♩
-      ['4n', '4n', '2n'],                 // ♩ ♩ ♩♩
-
-      // 八分音符組合（4拍）
-      ['8n', '8n', '4n', '4n', '4n'],     // ♪♪ ♩ ♩ ♩
-      ['4n', '8n', '8n', '4n', '4n'],     // ♩ ♪♪ ♩ ♩
-      ['4n', '4n', '8n', '8n', '4n'],     // ♩ ♩ ♪♪ ♩
-      ['4n', '4n', '4n', '8n', '8n'],     // ♩ ♩ ♩ ♪♪
-      ['8n', '8n', '8n', '8n', '2n'],     // ♪♪ ♪♪ ♩♩
-
-      // 十六分音符組合（4拍）
-      ['4n', '4n', '16n', '16n', '16n', '16n', '4n'],  // ♩ ♩ ♬♬ ♩
-      ['16n', '16n', '16n', '16n', '4n', '4n', '4n'],  // ♬♬ ♩ ♩ ♩
-      ['4n', '16n', '16n', '16n', '16n', '4n', '4n'],  // ♩ ♬♬ ♩ ♩
-      ['4n', '4n', '4n', '16n', '16n', '16n', '16n'],  // ♩ ♩ ♩ ♬♬
-
-      // 混合節奏 - 八分音符和四分音符（4拍）
-      ['8n', '8n', '4n', '8n', '8n', '4n'],  // ♪♪ ♩ ♪♪ ♩
-      ['4n', '8n', '8n', '8n', '8n', '4n'],  // ♩ ♪♪ ♪♪ ♩
-      ['8n', '8n', '8n', '8n', '4n', '4n'],  // ♪♪ ♪♪ ♩ ♩
-
-      // 混合節奏 - 二分音符和八分音符（4拍）
-      ['2n', '8n', '8n', '4n'],              // ♩♩ ♪♪ ♩
-      ['8n', '8n', '2n', '4n'],              // ♪♪ ♩♩ ♩
-      ['4n', '8n', '8n', '2n'],              // ♩ ♪♪ ♩♩
-
-      // 混合節奏 - 十六分音符和八分音符（4拍）
-      ['16n', '16n', '16n', '16n', '8n', '8n', '4n', '4n'],  // ♬♬ ♪♪ ♩ ♩
-      ['8n', '8n', '16n', '16n', '16n', '16n', '4n'],        // ♪♪ ♬♬ ♩
-      ['4n', '16n', '16n', '8n', '8n', '4n'],                // ♩ ♬ ♪♪ ♩
-
-      // 特殊組合（4拍）
-      ['8n', '8n', '4n', '4n', '8n', '8n'],  // ♪♪ ♩ ♩ ♪♪
-      ['4n', '8n', '4n', '8n', '4n'],        // ♩ ♪ ♩ ♪ ♩
+    // 定义节奏型态（根据小节数提供不同的节奏型态）
+    const rhythmPatterns = measureCount === 2 ? [
+      // 2小节的节奏型态（8拍）
+      ['4n', '4n', '4n', '4n', '4n', '4n', '4n', '4n'],           // ♩ ♩ ♩ ♩ | ♩ ♩ ♩ ♩
+      ['2n', '2n', '2n', '2n'],                                   // ♩♩ ♩♩ | ♩♩ ♩♩
+      ['2n', '4n', '4n', '2n', '4n', '4n'],                       // ♩♩ ♩ ♩ | ♩♩ ♩ ♩
+      ['4n', '4n', '2n', '4n', '4n', '2n'],                       // ♩ ♩ ♩♩ | ♩ ♩ ♩♩
+      ['8n', '8n', '4n', '4n', '4n', '8n', '8n', '4n', '4n', '4n'], // ♪♪ ♩ ♩ ♩ | ♪♪ ♩ ♩ ♩
+      ['4n', '8n', '8n', '4n', '4n', '4n', '8n', '8n', '4n', '4n']  // ♩ ♪♪ ♩ ♩ | ♩ ♪♪ ♩ ♩
+    ] : [
+      // 4小节的节奏型态（16拍）
+      ['4n', '4n', '4n', '4n', '4n', '4n', '4n', '4n', '4n', '4n', '4n', '4n', '4n', '4n', '4n', '4n'],  // 全四分音符
+      ['2n', '2n', '2n', '2n', '2n', '2n', '2n', '2n'],  // 全二分音符
+      ['2n', '4n', '4n', '2n', '2n', '4n', '4n', '2n'],  // 混合节奏
+      ['8n', '8n', '4n', '4n', '4n', '8n', '8n', '4n', '4n', '4n', '8n', '8n', '4n', '4n', '4n', '8n', '8n', '4n', '4n', '4n']  // 包含八分音符
     ];
 
-    // 隨機選擇節奏型態
+    // 随机选择节奏型态
     const selectedRhythm = rhythmPatterns[Math.floor(Math.random() * rhythmPatterns.length)];
 
-    // 為每個和弦生成相應的旋律音符
-    const melody: { note: string; duration: string }[] = [];
-    let rhythmIndex = 0;
-    let chordIndex = 0;
-
-    // 根據選定的節奏型態生成旋律
-    selectedRhythm.forEach((duration) => {
-      // 獲取當前和弦
-      const rootNote = selectedProgression[chordIndex];
-      const octave = rootNote.slice(-1);
-      const note = rootNote.slice(0, -1);
-
-      // 根據和弦音程生成可能的旋律音符（需要根據當前調性調整）
-      let possibleNotes: string[] = [];
-      const chordNotes = getChordNotes(note, octave);
-      possibleNotes = chordNotes;
-
-      // 從和弦音中隨機選擇一個音符
-      const selectedNote = possibleNotes[Math.floor(Math.random() * possibleNotes.length)];
-      melody.push({
-        note: selectedNote,
-        duration: duration
-      });
-
-      // 只有在遇到四分音符或二分音符時才更新和弦
-      if (duration === '4n' || duration === '2n') {
-        rhythmIndex++;
-        if (rhythmIndex >= 2) {
-          rhythmIndex = 0;
-          chordIndex = Math.min(chordIndex + 1, selectedProgression.length - 1);
-        }
-      }
-    });
+    // 生成旋律
+    const melody: { note: string; duration: string }[] = selectedRhythm.map(duration => ({
+      note: availableNotes[Math.floor(Math.random() * availableNotes.length)],
+      duration: duration
+    }));
 
     setCurrentMelody(melody);
-    setCanReplay(true);  // 新增：啟用重播按鈕
+    setCanReplay(true);
     drawScore(melody);
 
-    // 修改 generateCMajorMelody 函數中的時間計算
+    // 播放旋律
     let time = 0;
     const now = Tone.now();
 
     melody.forEach(({ note, duration }) => {
-      // 根據音符時值設置持續時間（以秒為單位）
       let durationInSeconds;
       switch (duration) {
         case '2n':
-          durationInSeconds = 1.0;  // 二分音符 = 1秒
+          durationInSeconds = 1.0;
           break;
         case '4n':
-          durationInSeconds = 0.5;  // 四分音符 = 0.5秒
+          durationInSeconds = 0.5;
           break;
         case '8n':
-          durationInSeconds = 0.25; // 八分音符 = 0.25秒
+          durationInSeconds = 0.25;
           break;
         case '16n':
-          durationInSeconds = 0.125; // 十六分音符 = 0.125秒
+          durationInSeconds = 0.125;
           break;
         default:
-          durationInSeconds = 0.5;  // 預設為四分音符
+          durationInSeconds = 0.5;
       }
 
-      // 使用更精確的時間控制
       synth.triggerAttackRelease(note, durationInSeconds, now + time);
 
       setTimeout(() => {
@@ -521,9 +485,21 @@ export default function Piano() {
     }
   };
 
+  // 新增：獲取當前旋律的唱名
+  const getMelodySolfege = (melody: { note: string; duration: string }[]) => {
+    return melody.map(({ note, duration }) => {
+      const noteName = note.slice(0, -1);
+      const solfege = NOTE_TO_SOLFEGE[noteName.replace(/[#b]/, '')];
+      return {
+        solfege,
+        duration
+      };
+    });
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4 gap-8">
-      <div className="flex gap-4">
+      <div className="flex gap-4 flex-wrap justify-center">
         <button
           onClick={generateCMajorMelody}
           disabled={isPlaying}
@@ -574,23 +550,69 @@ export default function Piano() {
           {showScore ? '隱藏五線譜' : '顯示五線譜'}
         </button>
 
-
+        <button
+          onClick={() => setMeasureCount(measureCount === 2 ? 4 : 2)}
+          className={`
+            px-6 py-3 rounded-full text-white font-semibold
+            bg-teal-500 hover:bg-teal-600 active:bg-teal-700
+            transition-colors shadow-lg
+          `}
+        >
+          {`切換為 ${measureCount === 2 ? '4' : '2'} 小節`}
+        </button>
       </div>
 
       <div
         className={`
-          bg-white p-4 rounded-lg shadow-lg
+          flex flex-col gap-4
           transition-all duration-500 ease-in-out
           ${showScore ? 'opacity-100 visible' : 'opacity-0 invisible'}
           transform ${showScore ? 'translate-y-0' : '-translate-y-4'}
+          w-full max-w-[95vw]
         `}
       >
-        <div
-          id="score"
-          ref={scoreRef}
-          style={{ minWidth: '500px', minHeight: '200px' }}
-        />
+        {currentScale && (
+          <div className="bg-white p-4 rounded-lg shadow-lg">
+            <h2 className="text-2xl font-bold text-gray-800 text-center">
+              當前調性：{currentScale}
+            </h2>
+          </div>
+        )}
+
+        <div className="bg-white p-8 rounded-lg shadow-lg overflow-x-auto">
+          <div
+            id="score"
+            ref={scoreRef}
+            style={{
+              minWidth: measureCount === 2 ? '800px' : '1200px',
+              minHeight: measureCount === 2 ? '250px' : '500px',
+              margin: '0 auto'
+            }}
+          />
+        </div>
       </div>
+
+      {showSolfege && currentMelody.length > 0 && (
+        <div className="bg-white p-4 rounded-lg shadow-lg w-full max-w-[95vw] overflow-x-auto">
+          <div className="flex justify-center items-center gap-4" style={{
+            minWidth: measureCount === 2 ? '800px' : '1200px',
+          }}>
+            {getMelodySolfege(currentMelody).map((item, index) => (
+              <div
+                key={index}
+                className={`
+                  text-center font-semibold text-lg text-black
+                  ${item.duration === '2n' ? 'w-16' :
+                    item.duration === '4n' ? 'w-12' :
+                      item.duration === '8n' ? 'w-8' : 'w-6'}
+                `}
+              >
+                {item.solfege}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="relative flex overflow-x-auto max-w-full p-4">
         <div className="relative flex">
@@ -598,7 +620,6 @@ export default function Piano() {
             const isBlackKey = key.color === 'black';
             const previousKey = index > 0 ? PIANO_KEYS[index - 1] : null;
 
-            // 計算黑鍵的位置偏移
             let marginLeft = '0px';
             if (isBlackKey) {
               marginLeft = '-1rem';
@@ -606,7 +627,6 @@ export default function Piano() {
               marginLeft = '0px';
             }
 
-            // 判斷是否需要更大的間距（在 E 和 B 音符之後）
             const noteWithoutOctave = key.note.replace(/\d+/, '');
             if (!isBlackKey && (noteWithoutOctave === 'E' || noteWithoutOctave === 'B')) {
               marginLeft = '0px';
@@ -625,9 +645,7 @@ export default function Piano() {
                   ${isBlackKey ? 'hover:bg-gray-800' : 'hover:bg-gray-50'}
                   shadow-md
                 `}
-                style={{
-                  marginLeft: marginLeft
-                }}
+                style={{ marginLeft }}
                 onMouseDown={() => playNote(key.note)}
                 onMouseUp={() => stopNote(key.note)}
                 onMouseLeave={() => stopNote(key.note)}
