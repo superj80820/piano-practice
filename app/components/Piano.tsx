@@ -60,52 +60,52 @@ const SCALES = {
     ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'],
     // G大調 (G Major)
     ['G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F#5', 'G5'],
-    // D大調 (D Major)
-    ['D4', 'E4', 'F#4', 'G4', 'A4', 'B4', 'C#5', 'D5'],
-    // A大調 (A Major)
-    ['A4', 'B4', 'C#5', 'D5', 'E5', 'F#5', 'G#5', 'A5'],
-    // E大調 (E Major)
-    ['E4', 'F#4', 'G#4', 'A4', 'B4', 'C#5', 'D#5', 'E5'],
-    // B大調 (B Major)
-    ['B4', 'C#5', 'D#5', 'E5', 'F#5', 'G#5', 'A#5', 'B5'],
+    // // D大調 (D Major)
+    // ['D4', 'E4', 'F#4', 'G4', 'A4', 'B4', 'C#5', 'D5'],
+    // // A大調 (A Major)
+    // ['A4', 'B4', 'C#5', 'D5', 'E5', 'F#5', 'G#5', 'A5'],
+    // // E大調 (E Major)
+    // ['E4', 'F#4', 'G#4', 'A4', 'B4', 'C#5', 'D#5', 'E5'],
+    // // B大調 (B Major)
+    // ['B4', 'C#5', 'D#5', 'E5', 'F#5', 'G#5', 'A#5', 'B5'],
     // F大調 (F Major)
     ['F4', 'G4', 'A4', 'Bb4', 'C5', 'D5', 'E5', 'F5'],
-    // Bb大調 (Bb Major)
-    ['Bb4', 'C5', 'D5', 'Eb5', 'F5', 'G5', 'A5', 'Bb5'],
-    // Eb大調 (Eb Major)
-    ['Eb4', 'F4', 'G4', 'Ab4', 'Bb4', 'C5', 'D5', 'Eb5'],
-    // Ab大調 (Ab Major)
-    ['Ab4', 'Bb4', 'C5', 'Db5', 'Eb5', 'F5', 'G5', 'Ab5'],
-    // Db大調 (Db Major)
-    ['Db4', 'Eb4', 'F4', 'Gb4', 'Ab4', 'Bb4', 'C5', 'Db5'],
-    // Gb大調 (Gb Major)
-    ['Gb4', 'Ab4', 'Bb4', 'Cb5', 'Db5', 'Eb5', 'F5', 'Gb5']
+    // // Bb大調 (Bb Major)
+    // ['Bb4', 'C5', 'D5', 'Eb5', 'F5', 'G5', 'A5', 'Bb5'],
+    // // Eb大調 (Eb Major)
+    // ['Eb4', 'F4', 'G4', 'Ab4', 'Bb4', 'C5', 'D5', 'Eb5'],
+    // // Ab大調 (Ab Major)
+    // ['Ab4', 'Bb4', 'C5', 'Db5', 'Eb5', 'F5', 'G5', 'Ab5'],
+    // // Db大調 (Db Major)
+    // ['Db4', 'Eb4', 'F4', 'Gb4', 'Ab4', 'Bb4', 'C5', 'Db5'],
+    // // Gb大調 (Gb Major)
+    // ['Gb4', 'Ab4', 'Bb4', 'Cb5', 'Db5', 'Eb5', 'F5', 'Gb5']
   ],
   minor: [
-    // A小調 (A Minor)
-    ['A4', 'B4', 'C5', 'D5', 'E5', 'F5', 'G5', 'A5'],
-    // E小調 (E Minor)
-    ['E4', 'F#4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5'],
-    // B小調 (B Minor)
-    ['B4', 'C#5', 'D5', 'E5', 'F#5', 'G5', 'A5', 'B5'],
-    // F#小調 (F# Minor)
-    ['F#4', 'G#4', 'A4', 'B4', 'C#5', 'D5', 'E5', 'F#5'],
-    // C#小調 (C# Minor)
-    ['C#4', 'D#4', 'E4', 'F#4', 'G#4', 'A4', 'B4', 'C#5'],
-    // G#小調 (G# Minor)
-    ['G#4', 'A#4', 'B4', 'C#5', 'D#5', 'E5', 'F#5', 'G#5'],
-    // D小調 (D Minor)
-    ['D4', 'E4', 'F4', 'G4', 'A4', 'Bb4', 'C5', 'D5'],
-    // G小調 (G Minor)
-    ['G4', 'A4', 'Bb4', 'C5', 'D5', 'Eb5', 'F5', 'G5'],
-    // C小調 (C Minor)
-    ['C4', 'D4', 'Eb4', 'F4', 'G4', 'Ab4', 'Bb4', 'C5'],
-    // F小調 (F Minor)
-    ['F4', 'G4', 'Ab4', 'Bb4', 'C5', 'Db5', 'Eb5', 'F5'],
-    // Bb小調 (Bb Minor)
-    ['Bb4', 'C5', 'Db5', 'Eb5', 'F5', 'Gb5', 'Ab5', 'Bb5'],
-    // Eb小調 (Eb Minor)
-    ['Eb4', 'F4', 'Gb4', 'Ab4', 'Bb4', 'Cb5', 'Db5', 'Eb5']
+    // // A小調 (A Minor)
+    // ['A4', 'B4', 'C5', 'D5', 'E5', 'F5', 'G5', 'A5'],
+    // // E小調 (E Minor)
+    // ['E4', 'F#4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5'],
+    // // B小調 (B Minor)
+    // ['B4', 'C#5', 'D5', 'E5', 'F#5', 'G5', 'A5', 'B5'],
+    // // F#小調 (F# Minor)
+    // ['F#4', 'G#4', 'A4', 'B4', 'C#5', 'D5', 'E5', 'F#5'],
+    // // C#小調 (C# Minor)
+    // ['C#4', 'D#4', 'E4', 'F#4', 'G#4', 'A4', 'B4', 'C#5'],
+    // // G#小調 (G# Minor)
+    // ['G#4', 'A#4', 'B4', 'C#5', 'D#5', 'E5', 'F#5', 'G#5'],
+    // // D小調 (D Minor)
+    // ['D4', 'E4', 'F4', 'G4', 'A4', 'Bb4', 'C5', 'D5'],
+    // // G小調 (G Minor)
+    // ['G4', 'A4', 'Bb4', 'C5', 'D5', 'Eb5', 'F5', 'G5'],
+    // // C小調 (C Minor)
+    // ['C4', 'D4', 'Eb4', 'F4', 'G4', 'Ab4', 'Bb4', 'C5'],
+    // // F小調 (F Minor)
+    // ['F4', 'G4', 'Ab4', 'Bb4', 'C5', 'Db5', 'Eb5', 'F5'],
+    // // Bb小調 (Bb Minor)
+    // ['Bb4', 'C5', 'Db5', 'Eb5', 'F5', 'Gb5', 'Ab5', 'Bb5'],
+    // // Eb小調 (Eb Minor)
+    // ['Eb4', 'F4', 'Gb4', 'Ab4', 'Bb4', 'Cb5', 'Db5', 'Eb5']
   ]
 };
 
@@ -358,8 +358,7 @@ export default function Piano() {
     Tone.start();
 
     // 隨機選擇調性類型（大調或小調）
-    const scaleTypes = ['major', 'minor'] as const;
-    const selectedType = scaleTypes[Math.floor(Math.random() * scaleTypes.length)];
+    const selectedType = 'major'
 
     // 在選定的調性類型中隨機選擇一個音階
     const scales = SCALES[selectedType];
@@ -369,12 +368,14 @@ export default function Piano() {
     // 設置當前調性名稱
     const scaleNames = {
       major: [
-        'C 大調', 'G 大調', 'D 大調', 'A 大調', 'E 大調', 'B 大調',
-        'F 大調', 'Bb 大調', 'Eb 大調', 'Ab 大調', 'Db 大調', 'Gb 大調'
+        'C 大調', 'G 大調',
+        // 'D 大調', 'A 大調', 'E 大調', 'B 大調',
+        'F 大調',
+        // 'Bb 大調', 'Eb 大調', 'Ab 大調', 'Db 大調', 'Gb 大調'
       ],
       minor: [
-        'A 小調', 'E 小調', 'B 小調', 'F# 小調', 'C# 小調', 'G# 小調',
-        'D 小調', 'G 小調', 'C 小調', 'F 小調', 'Bb 小調', 'Eb 小調'
+        // 'A 小調', 'E 小調', 'B 小調', 'F# 小調', 'C# 小調', 'G# 小調',
+        // 'D 小調', 'G 小調', 'C 小調', 'F 小調', 'Bb 小調', 'Eb 小調'
       ]
     };
     setCurrentScale(scaleNames[selectedType][scaleIndex]);
