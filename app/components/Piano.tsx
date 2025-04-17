@@ -119,6 +119,8 @@ export default function Piano() {
   const [showSolfege, setShowSolfege] = useState(false);
   const [measureCount, setMeasureCount] = useState<2 | 4>(4);
   const [currentScale, setCurrentScale] = useState<string>('');
+  const [currentKey] = useState<string>('C');
+  const [availableNotesCount, setAvailableNotesCount] = useState<number>(8);
   const scoreRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -383,6 +385,11 @@ export default function Piano() {
     // 使用選定的音階
     const availableNotes = selectedScale;
 
+    // 隨機選擇指定數量的音符
+    const randomSelectedNotes = [...availableNotes]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, availableNotesCount);
+
     // 定义节奏型态（根据小节数提供不同的节奏型态）
     const rhythmPatterns = measureCount === 2 ? [
       // 2小节的节奏型态（8拍）
@@ -405,7 +412,7 @@ export default function Piano() {
 
     // 生成旋律
     const melody: { note: string; duration: string }[] = selectedRhythm.map(duration => ({
-      note: availableNotes[Math.floor(Math.random() * availableNotes.length)],
+      note: randomSelectedNotes[Math.floor(Math.random() * randomSelectedNotes.length)],
       duration: duration
     }));
 
@@ -557,6 +564,33 @@ export default function Piano() {
         >
           {`切換為 ${measureCount === 2 ? '4' : '2'} 小節`}
         </button>
+
+        <select
+          value={availableNotesCount}
+          onChange={(e) => setAvailableNotesCount(Number(e.target.value))}
+          className={`
+            px-6 py-3 rounded-full text-gray-700 font-semibold
+            bg-white border-2 border-indigo-500
+            hover:border-indigo-600 focus:border-indigo-700
+            transition-colors shadow-lg
+            cursor-pointer
+            appearance-none
+            relative
+          `}
+          style={{
+            backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%236366f1\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'right 1rem center',
+            backgroundSize: '1.5em 1.5em',
+            paddingRight: '3rem'
+          }}
+        >
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+            <option key={num} value={num}>
+              使用 {num} 個音符
+            </option>
+          ))}
+        </select>
       </div>
 
       <div
