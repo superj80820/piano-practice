@@ -119,7 +119,6 @@ export default function Piano() {
   const [showSolfege, setShowSolfege] = useState(false);
   const [measureCount, setMeasureCount] = useState<2 | 4>(4);
   const [currentScale, setCurrentScale] = useState<string>('');
-  const [currentKey] = useState<string>('C');
   const [availableNotesCount, setAvailableNotesCount] = useState<number>(8);
   const scoreRef = useRef<HTMLDivElement>(null);
 
